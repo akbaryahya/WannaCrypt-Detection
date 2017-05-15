@@ -8,6 +8,8 @@ using System.Management.Automation;
 using System.Net.Sockets;
 using System.Security.Principal;
 using System.Threading;
+using System.Globalization;
+using System.Management;
 
 namespace WannaCrypt_Detection
 {
@@ -90,6 +92,15 @@ namespace WannaCrypt_Detection
             return false;
         }
 
+        static string hotfixID = "4012212";
+        public static bool IsPatchAlreadyInstalled(string productCode, string patchCode)
+        {
+            var patches =
+                PatchInstallation.GetPatches(null, productCode, null, UserContexts.Machine, PatchStates.Applied);
+
+            return patches.Any(patch => patch.DisplayName == patchCode);
+        }
+
         private void Ceksaya_Click(object sender, EventArgs e)
         {
             //cek windows
@@ -119,7 +130,8 @@ namespace WannaCrypt_Detection
             }
 
             //cek port
-            Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}"; 
+            Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
+            IsPatchAlreadyInstalled();
 
         }
 
