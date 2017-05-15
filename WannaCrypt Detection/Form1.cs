@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Linq;
+using System.Globalization;
+using System.Management;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Management.Automation;
 using System.Net.Sockets;
 using System.Security.Principal;
 using System.Threading;
-using System.Globalization;
-using System.Management;
+using WUApiLib;
 
 namespace WannaCrypt_Detection
 {
@@ -91,19 +90,39 @@ namespace WannaCrypt_Detection
             }
             return false;
         }
-
-        static string hotfixID = "4012212";
-        public static bool IsPatchAlreadyInstalled(string productCode, string patchCode)
+        public static bool FindUpdates(string patch)
         {
-            var patches =
-                PatchInstallation.GetPatches(null, productCode, null, UserContexts.Machine, PatchStates.Applied);
+            //var session = new UpdateSession();
+            //var searcher = session.CreateUpdateSearcher();
+            //searcher.ServerSelection = ServerSelection.ssWindowsUpdate;
+            //ISearchResult searchresult = searcher.Search("");
+            //UpdateCollection updatecollection = searchresult.Updates;
+            //Console.WriteLine("Found " + updatecollection.Count + " updates.");
 
-            return patches.Any(patch => patch.DisplayName == patchCode);
+            //foreach (IUpdate5 update in updatecollection)
+            //{
+            //    Console.WriteLine(update.Title);
+            //}
+            var updateSession = new UpdateSession();
+            var updateSearcher = updateSession.CreateUpdateSearcher();
+            var count = updateSearcher.GetTotalHistoryCount();
+            if (count == 0)
+                return false;
+
+            var history = updateSearcher.QueryHistory(0, count);
+            for (int i = 0; i < count; i++)
+            {
+                Console.WriteLine($"{history[i].Title}");
+                if (history[i].Title.Contains(patch))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-
         private void Ceksaya_Click(object sender, EventArgs e)
         {
-            //cek windows
+            //cek windows, TODO: cek bit
             var ismy = IsWindows10();
             if (ismy.Contains("Windows 10"))
             {
@@ -131,7 +150,7 @@ namespace WannaCrypt_Detection
 
             //cek port
             Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
-            IsPatchAlreadyInstalled();
+            Patch_Lable.Text = $"KB4012212: {FindUpdates("KB4012212")}";
 
         }
 

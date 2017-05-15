@@ -37,7 +37,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.Windows_Label = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.Patch_Lable = new System.Windows.Forms.Label();
             this.Port_Label = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.SMB_Lable = new System.Windows.Forms.Label();
@@ -135,15 +135,15 @@
             this.Windows_Label.TabIndex = 8;
             this.Windows_Label.Text = "NO";
             // 
-            // label6
+            // Patch_Lable
             // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(124, 164);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(66, 37);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "NO";
+            this.Patch_Lable.AutoSize = true;
+            this.Patch_Lable.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Patch_Lable.Location = new System.Drawing.Point(124, 164);
+            this.Patch_Lable.Name = "Patch_Lable";
+            this.Patch_Lable.Size = new System.Drawing.Size(66, 37);
+            this.Patch_Lable.TabIndex = 9;
+            this.Patch_Lable.Text = "NO";
             // 
             // Port_Label
             // 
@@ -226,7 +226,7 @@
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.Port_Label);
-            this.Controls.Add(this.label6);
+            this.Controls.Add(this.Patch_Lable);
             this.Controls.Add(this.Windows_Label);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.button4);
@@ -257,7 +257,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label Windows_Label;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label Patch_Lable;
         private System.Windows.Forms.Label Port_Label;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label SMB_Lable;
