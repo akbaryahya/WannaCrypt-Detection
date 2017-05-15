@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -184,10 +185,10 @@ namespace WannaCrypt_Detection
 
             //cek port
             Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
-            Patch_Lable.Text = $"KB4012212: {FindUpdates("4012212")}";
+            Patch_Lable.Text = $"{ispatchsafe()}";
             WC_Label.Text = $"wanncry: {IsProcessOpen("wanncry")} | @WanaDecryptor@: {IsProcessOpen("@WanaDecryptor@")}";
 
-            /*
+            /*            
             Windows XP: 4012598
             Windows Vista SP2: 4012598,4012598
             Windows Server 2008: 4012598
@@ -198,47 +199,19 @@ namespace WannaCrypt_Detection
             */
         }
 
-        public bool ispatchsafe(string mywindows)
+        public int ispatchsafe()
         {
+            List<string> listcek = new List<string>(new[] { "4012212", "4012217", "4015551", "4019216", "4012216", "4015550", "4019215", "4013429", "4019472", "4015217", "4015438", "4016635"});
             var isme = 0;
-            if (mywindows.Contains("Windows 10"))
+            foreach (var k in listcek) 
             {
-                
-                if (FindUpdates("4012606"))
-                {
-                    isme++;
-                }
-                if (FindUpdates("4013198"))
-                {
-                    isme++;
-                }
-                if (FindUpdates("4013429"))
+                if (FindUpdates(k))
                 {
                     isme++;
                 }
             }
-            if (mywindows.Contains("Windows XP"))
-            {
-                if (FindUpdates("4012598"))
-                {
-                    isme++;
-                }
-            }
-            if (mywindows.Contains("Windows Server 2008"))
-            {
-                if (FindUpdates("4012598"))
-                {
-                    isme++;
-                }
-            }
-            if (mywindows.Contains("Windows 7"))
-            {
-                if (FindUpdates("4012212"))
-                {
-                    isme++;
-                }
-            }
-            return 
+            var relp = Convert.ToDouble(listcek.Count) / Convert.ToDouble(isme) * 100;
+            return (int)relp; 
         }
 
         private void CekFast(object sender, EventArgs e)
