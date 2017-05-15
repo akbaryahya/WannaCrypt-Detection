@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace WannaCrypt_Detection
 {
@@ -15,6 +10,27 @@ namespace WannaCrypt_Detection
         public Form1()
         {
             InitializeComponent();
+        }
+
+        static string IsWindows10()
+        {
+            var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+            return (string)reg.GetValue("ProductName");
+        }
+
+        private void Ceksaya_Click(object sender, EventArgs e)
+        {
+            var ismy = IsWindows10();
+            if (ismy.Contains("Windows 10"))
+            {
+                Windows_Label.ForeColor = Color.Green;
+                Windows_Label.Text = ismy;
+            }
+            else
+            {
+                Windows_Label.ForeColor = Color.Red;
+                Windows_Label.Text = ismy;
+            }
         }
     }
 }
