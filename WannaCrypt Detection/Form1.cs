@@ -113,7 +113,7 @@ namespace WannaCrypt_Detection
             for (int i = 0; i < count; i++)
             {
                 Console.WriteLine($"{history[i].Title}");
-                if (history[i].Title.Contains(patch))
+                if (history[i].Title.Contains("KB"+patch))
                 {
                     return true;
                 }
@@ -150,7 +150,16 @@ namespace WannaCrypt_Detection
 
             //cek port
             Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
-            Patch_Lable.Text = $"KB4012212: {FindUpdates("KB4012212")}";
+            Patch_Lable.Text = $"KB4012212: {FindUpdates("4012212")}";
+            /*
+            Windows XP: KB4012598
+            Windows Vista SP2: 4012598,4012598
+            Windows Server 2008: 4012598
+            Windows 7/Windows Server 2008: 4012212,4012215
+            Windows 8.1/Windows Server 2012/Windows Server 2012 R2: 4012213,4012216 
+            Windows 10: 4012606,4013198,4013429
+            Windows Server 2016: 4013429
+            */
 
         }
 
