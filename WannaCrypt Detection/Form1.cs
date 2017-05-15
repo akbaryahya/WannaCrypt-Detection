@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Management;
@@ -42,11 +43,40 @@ namespace WannaCrypt_Detection
             var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
             return (string)reg.GetValue("ProductName");
         }
-
-        static string IsSMBold() 
+        public bool IsProcessOpen(string name)
         {
-            var reg = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters");
-            return (string)reg.GetValue("SMB1");
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                Console.WriteLine(clsProcess.ProcessName);
+                if (clsProcess.ProcessName.Contains(name))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool FindService(string nama) 
+        {
+            using (PowerShell ps = PowerShell.Create())
+            {
+                ps.AddScript("Get-Service | Select Status,Name,DisplayName");//-Name *lan*
+                IAsyncResult result = ps.BeginInvoke();
+                while (result.IsCompleted == false)
+                {
+                    Console.WriteLine("Waiting for pipeline to finish...");
+                    Thread.Sleep(1000);
+                }
+                Console.WriteLine("Finished!");
+                foreach (PSObject resultx in ps.Invoke())
+                {
+                    Console.WriteLine($"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
+                    if (resultx.Members["Name"].Value.ToString().Contains(nama))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         static bool IsPortClose(int port = 80)
@@ -87,6 +117,10 @@ namespace WannaCrypt_Detection
                         return true;
                     }
                 }
+            }
+            if (FindService("LanmanServer"))
+            {
+                return true;
             }
             return false;
         }
@@ -151,8 +185,10 @@ namespace WannaCrypt_Detection
             //cek port
             Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
             Patch_Lable.Text = $"KB4012212: {FindUpdates("4012212")}";
+            WC_Label.Text = $"wanncry: {IsProcessOpen("wanncry")} | @WanaDecryptor@: {IsProcessOpen("@WanaDecryptor@")}";
+
             /*
-            Windows XP: KB4012598
+            Windows XP: 4012598
             Windows Vista SP2: 4012598,4012598
             Windows Server 2008: 4012598
             Windows 7/Windows Server 2008: 4012212,4012215
@@ -160,7 +196,49 @@ namespace WannaCrypt_Detection
             Windows 10: 4012606,4013198,4013429
             Windows Server 2016: 4013429
             */
+        }
 
+        public bool ispatchsafe(string mywindows)
+        {
+            var isme = 0;
+            if (mywindows.Contains("Windows 10"))
+            {
+                
+                if (FindUpdates("4012606"))
+                {
+                    isme++;
+                }
+                if (FindUpdates("4013198"))
+                {
+                    isme++;
+                }
+                if (FindUpdates("4013429"))
+                {
+                    isme++;
+                }
+            }
+            if (mywindows.Contains("Windows XP"))
+            {
+                if (FindUpdates("4012598"))
+                {
+                    isme++;
+                }
+            }
+            if (mywindows.Contains("Windows Server 2008"))
+            {
+                if (FindUpdates("4012598"))
+                {
+                    isme++;
+                }
+            }
+            if (mywindows.Contains("Windows 7"))
+            {
+                if (FindUpdates("4012212"))
+                {
+                    isme++;
+                }
+            }
+            return 
         }
 
         private void CekFast(object sender, EventArgs e)
