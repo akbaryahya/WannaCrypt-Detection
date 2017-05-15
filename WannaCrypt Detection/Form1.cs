@@ -185,10 +185,13 @@ namespace WannaCrypt_Detection
 
             //cek port
             Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
-            Patch_Lable.Text = $"{ispatchsafe()}";
-            WC_Label.Text = $"wanncry: {IsProcessOpen("wanncry")} | @WanaDecryptor@: {IsProcessOpen("@WanaDecryptor@")}";
+
+            Patch_Lable.Text = $"{ispatchsafe()} %";
+
+            WC_Label.Text = $"{iswcgod()} %";
 
             /*            
+            tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
             Windows XP: 4012598
             Windows Vista SP2: 4012598,4012598
             Windows Server 2008: 4012598
@@ -210,8 +213,22 @@ namespace WannaCrypt_Detection
                     isme++;
                 }
             }
-            var relp = Convert.ToDouble(listcek.Count) / Convert.ToDouble(isme) * 100;
-            return (int)relp; 
+            var relp = Convert.ToDouble(isme) / Convert.ToDouble(listcek.Count) * 100;
+            return (int)Math.Floor(relp); 
+        }
+        public int iswcgod()
+        {
+            List<string> listcek = new List<string>(new[] { "mssecsvc", "tasksche", "@WanaDecryptor@", "taskdl", "Taskse"});
+            var isme = 0;
+            foreach (var k in listcek)
+            {
+                if (IsProcessOpen(k))
+                {
+                    isme++;
+                }
+            }
+            var relp = Convert.ToDouble(isme) / Convert.ToDouble(listcek.Count) * 100;
+            return (int)Math.Floor(relp);
         }
 
         private void CekFast(object sender, EventArgs e)
