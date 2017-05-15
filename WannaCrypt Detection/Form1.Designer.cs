@@ -159,7 +159,7 @@
             // 
             this.WC_Label.AutoSize = true;
             this.WC_Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.WC_Label.Location = new System.Drawing.Point(12, 283);
+            this.WC_Label.Location = new System.Drawing.Point(297, 246);
             this.WC_Label.Name = "WC_Label";
             this.WC_Label.Size = new System.Drawing.Size(66, 37);
             this.WC_Label.TabIndex = 11;
@@ -218,7 +218,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(724, 319);
+            this.ClientSize = new System.Drawing.Size(724, 290);
             this.Controls.Add(this.Admin_Label);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button5);
@@ -236,8 +236,8 @@
             this.Controls.Add(this.labelapaaja);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Ceksaya);
-            this.MaximumSize = new System.Drawing.Size(740, 358);
-            this.MinimumSize = new System.Drawing.Size(740, 358);
+            this.MaximumSize = new System.Drawing.Size(740, 329);
+            this.MinimumSize = new System.Drawing.Size(740, 329);
             this.Name = "Form1";
             this.Text = "WannaCrypt Detection";
             this.Load += new System.EventHandler(this.CekFast);

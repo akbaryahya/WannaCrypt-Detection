@@ -184,7 +184,7 @@ namespace WannaCrypt_Detection
             }
 
             //cek port
-            Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
+            Port_Label.Text = $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}";
 
             Patch_Lable.Text = $"{ispatchsafe()} %";
 
