@@ -38,7 +38,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.Windows_Label = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
+            this.Port_Label = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.SMB_Lable = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -145,15 +145,15 @@
             this.label6.TabIndex = 9;
             this.label6.Text = "NO";
             // 
-            // label7
+            // Port_Label
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(174, 209);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(66, 37);
-            this.label7.TabIndex = 10;
-            this.label7.Text = "NO";
+            this.Port_Label.AutoSize = true;
+            this.Port_Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Port_Label.Location = new System.Drawing.Point(174, 209);
+            this.Port_Label.Name = "Port_Label";
+            this.Port_Label.Size = new System.Drawing.Size(66, 37);
+            this.Port_Label.TabIndex = 10;
+            this.Port_Label.Text = "NO";
             // 
             // label8
             // 
@@ -225,7 +225,7 @@
             this.Controls.Add(this.SMB_Lable);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.label7);
+            this.Controls.Add(this.Port_Label);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.Windows_Label);
             this.Controls.Add(this.label4);
@@ -258,7 +258,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label Windows_Label;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label Port_Label;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label SMB_Lable;
         private System.Windows.Forms.Label label10;

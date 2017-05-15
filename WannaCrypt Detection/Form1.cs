@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Management.Automation;
+using System.Net.Sockets;
 using System.Security.Principal;
 using System.Threading;
 
@@ -45,32 +47,47 @@ namespace WannaCrypt_Detection
             var reg = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters");
             return (string)reg.GetValue("SMB1");
         }
-        
-        static void IsSMBnew()
+
+        static bool IsPortClose(int port = 80)
         {
-            using (PowerShell PowerShellInstance = PowerShell.Create())
+            using (TcpClient tcpClient = new TcpClient())
             {
-                // this script has a sleep in it to simulate a long running script
-                PowerShellInstance.AddScript("dism /online /Get-Features");
-
-                // begin invoke execution on the pipeline
-                IAsyncResult result = PowerShellInstance.BeginInvoke();
-
-                // do something else until execution has completed.
-                // this could be sleep/wait, or perhaps some other work
+                try
+                {
+                    tcpClient.Connect("127.0.0.1", port);
+                    return false;
+                }
+                catch (Exception)
+                {
+                    //noting here
+                }
+            }
+            return true;
+        }
+        
+        static bool IsSMBnew()
+        {
+            //or use https://github.com/cseelye/windiskhelper/blob/28be60045e79c557eb33558ee65faf3e7d84629c/MicrosoftInitiator.cs#L3855
+            using (PowerShell ps = PowerShell.Create())
+            {
+                ps.AddScript("Get-SmbServerConfiguration | Select EnableSMB1Protocol, EnableSMB2Protocol");
+                IAsyncResult result = ps.BeginInvoke();
                 while (result.IsCompleted == false)
                 {
                     Console.WriteLine("Waiting for pipeline to finish...");
                     Thread.Sleep(1000);
-
-                    // might want to place a timeout here...
-                }
-                foreach (PSObject output2 in PowerShellInstance.Invoke())
-                {
-                    Console.WriteLine(output2);
                 }
                 Console.WriteLine("Finished!");
+                foreach (PSObject resultx in ps.Invoke())
+                {
+                    Console.WriteLine($"{resultx.Members["EnableSMB1Protocol"].Value}|{resultx.Members["EnableSMB2Protocol"].Value}");
+                    if (resultx.Members["EnableSMB1Protocol"].Value.ToString() == "True" && resultx.Members["EnableSMB2Protocol"].Value.ToString() == "True")
+                    {
+                        return true;
+                    }
+                }
             }
+            return false;
         }
 
         private void Ceksaya_Click(object sender, EventArgs e)
@@ -89,9 +106,20 @@ namespace WannaCrypt_Detection
             }
 
             //cek SMB, TODO: cek windows 7
-            IsSMBnew();
-            var ismb = IsSMBold();
-            SMB_Lable.Text = ismb;
+            var ismb = IsSMBnew();
+            if (!ismb)
+            {
+                SMB_Lable.ForeColor = Color.Green;
+                SMB_Lable.Text = "YES";
+            }
+            else
+            {
+                SMB_Lable.ForeColor = Color.Red;
+                SMB_Lable.Text = "NO";
+            }
+
+            //cek port
+            Port_Label.Text = $"139 {IsPortClose(139)} 445 {IsPortClose(445)} 3389 {IsPortClose(3389)}";
 
         }
 
