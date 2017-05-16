@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Management;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Management.Automation;
@@ -12,6 +10,7 @@ using System.Net.Sockets;
 using System.Security.Principal;
 using System.Threading;
 using WUApiLib;
+// ReSharper disable LocalizableElement
 
 namespace WannaCrypt_Detection
 {
@@ -30,11 +29,11 @@ namespace WannaCrypt_Detection
                 WindowsPrincipal principal = new WindowsPrincipal(user);
                 isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 isAdmin = false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 isAdmin = false;
             }
@@ -43,7 +42,8 @@ namespace WannaCrypt_Detection
         static string IsWindows10()
         {
             var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-            return (string)reg.GetValue("ProductName");
+            if (reg != null) return (string)reg.GetValue("ProductName");
+            return "Not known";
         }
         public bool IsProcessOpen(string name)
         {
@@ -98,7 +98,7 @@ namespace WannaCrypt_Detection
             return true;
         }
         
-        public bool IsSMBnew()
+        public bool IsSmBnew()
         {
             //or use https://github.com/cseelye/windiskhelper/blob/28be60045e79c557eb33558ee65faf3e7d84629c/MicrosoftInitiator.cs#L3855
             using (PowerShell ps = PowerShell.Create())
@@ -157,7 +157,7 @@ namespace WannaCrypt_Detection
             return false;
         }
 
-        public void startcek()
+        public void Startcek()
         {
             Ceksaya.Enabled = false;
             ThreadPool.QueueUserWorkItem(state =>
@@ -176,7 +176,7 @@ namespace WannaCrypt_Detection
                 }
 
                 //cek SMB, TODO: cek windows 7
-                var ismb = IsSMBnew();
+                var ismb = IsSmBnew();
                 if (!ismb)
                 {
                     ThreadHelperClass.SetText(this, SMB_Lable, "YES");
@@ -191,9 +191,9 @@ namespace WannaCrypt_Detection
                 //cek port
                 ThreadHelperClass.SetText(this, Port_Label, $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}");
 
-                ThreadHelperClass.SetText(this, Patch_Lable, $"{ispatchsafe()} %");
+                ThreadHelperClass.SetText(this, Patch_Lable, $"{Ispatchsafe()} %");
 
-                ThreadHelperClass.SetText(this, WC_Label, $"{iswcgod()} %"); 
+                ThreadHelperClass.SetText(this, WC_Label, $"{Iswcgod()} %"); 
 
                 /*
                 tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
@@ -213,10 +213,10 @@ namespace WannaCrypt_Detection
 
         private void Ceksaya_Click(object sender, EventArgs e)
         {
-            startcek();
+            Startcek();
         }
 
-        public int ispatchsafe()
+        public int Ispatchsafe()
         {
             List<string> listcek = new List<string>(new[] { "4012212", "4012217", "4015551", "4019216", "4012216", "4015550", "4019215", "4013429", "4019472", "4015217", "4015438", "4016635"});
             var isme = 0;
@@ -230,7 +230,7 @@ namespace WannaCrypt_Detection
             var relp = Convert.ToDouble(isme) / Convert.ToDouble(listcek.Count) * 100;
             return (int)Math.Floor(relp); 
         }
-        public int iswcgod()
+        public int Iswcgod()
         {
             List<string> listcek = new List<string>(new[] { "mssecsvc", "tasksche", "@WanaDecryptor@", "taskdl", "Taskse"});
             var isme = 0;
@@ -260,16 +260,16 @@ namespace WannaCrypt_Detection
             }
         }
         public static DateTime Timex = DateTime.Now;
-        public static string logtxt = Path.Combine(Program.Path, $"log-{Timex:yyyyMMdd}.txt");
-        public static void AddLog(string line, string Log, bool time = true)
+        public static string Logtxt = Path.Combine(Program.Path, $"log-{Timex:yyyyMMdd}.txt");
+        public static void AddLog(string line, string log, bool time = true)
         {
-            if (!File.Exists(Log))
+            if (!File.Exists(log))
             {
-                File.Create(Log);
+                File.Create(log);
             }
             try
             {
-                TextWriter tw = new StreamWriter(Log, true);
+                TextWriter tw = new StreamWriter(log, true);
                 var timex = $"[{DateTime.Now:G}] ";
                 if (!time)
                     timex = "";
@@ -303,7 +303,7 @@ namespace WannaCrypt_Detection
                     LogMe.AppendText(text + "\n");
                     LogMe.SelectionStart = LogMe.Text.Length;
                     LogMe.ScrollToCaret();
-                    AddLog(text, logtxt);
+                    AddLog(text, Logtxt);
                 }
                 catch (Exception)
                 {
