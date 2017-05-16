@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{252B7943-5A09-42AA-AA2B-ED56E72704AB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>WannaCrypt_Detection</RootNamespace>
     <AssemblyName>WannaCrypt Detection</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>

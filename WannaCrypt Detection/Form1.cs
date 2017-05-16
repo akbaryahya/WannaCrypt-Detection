@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Management;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -48,7 +49,7 @@ namespace WannaCrypt_Detection
         {
             foreach (Process clsProcess in Process.GetProcesses())
             {
-                Console.WriteLine(clsProcess.ProcessName);
+                Logme(Color.Gold, clsProcess.ProcessName);
                 if (clsProcess.ProcessName.Contains(name))
                 {
                     return true;
@@ -56,7 +57,7 @@ namespace WannaCrypt_Detection
             }
             return false;
         }
-        public static bool FindService(string nama) 
+        public bool FindService(string nama) 
         {
             using (PowerShell ps = PowerShell.Create())
             {
@@ -64,13 +65,13 @@ namespace WannaCrypt_Detection
                 IAsyncResult result = ps.BeginInvoke();
                 while (result.IsCompleted == false)
                 {
-                    Console.WriteLine("Waiting for pipeline to finish...");
+                    Logme(Color.Gold, "Waiting for pipeline to finish...");
                     Thread.Sleep(1000);
                 }
-                Console.WriteLine("Finished!");
+                Logme(Color.Gold, "Finished!");
                 foreach (PSObject resultx in ps.Invoke())
                 {
-                    Console.WriteLine($"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
+                    Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
                     if (resultx.Members["Name"].Value.ToString().Contains(nama))
                     {
                         return true;
@@ -97,7 +98,7 @@ namespace WannaCrypt_Detection
             return true;
         }
         
-        static bool IsSMBnew()
+        public bool IsSMBnew()
         {
             //or use https://github.com/cseelye/windiskhelper/blob/28be60045e79c557eb33558ee65faf3e7d84629c/MicrosoftInitiator.cs#L3855
             using (PowerShell ps = PowerShell.Create())
@@ -106,13 +107,13 @@ namespace WannaCrypt_Detection
                 IAsyncResult result = ps.BeginInvoke();
                 while (result.IsCompleted == false)
                 {
-                    Console.WriteLine("Waiting for pipeline to finish...");
+                    Logme(Color.Gold, "Waiting for pipeline to finish...");
                     Thread.Sleep(1000);
                 }
-                Console.WriteLine("Finished!");
+                Logme(Color.Gold, "Finished!");
                 foreach (PSObject resultx in ps.Invoke())
                 {
-                    Console.WriteLine($"{resultx.Members["EnableSMB1Protocol"].Value}|{resultx.Members["EnableSMB2Protocol"].Value}");
+                    Logme(Color.Gold, $"{resultx.Members["EnableSMB1Protocol"].Value}|{resultx.Members["EnableSMB2Protocol"].Value}");
                     if (resultx.Members["EnableSMB1Protocol"].Value.ToString() == "True" && resultx.Members["EnableSMB2Protocol"].Value.ToString() == "True")
                     {
                         return true;
@@ -125,7 +126,7 @@ namespace WannaCrypt_Detection
             }
             return false;
         }
-        public static bool FindUpdates(string patch)
+        public bool FindUpdates(string patch)
         {
             //var session = new UpdateSession();
             //var searcher = session.CreateUpdateSearcher();
@@ -147,7 +148,7 @@ namespace WannaCrypt_Detection
             var history = updateSearcher.QueryHistory(0, count);
             for (int i = 0; i < count; i++)
             {
-                Console.WriteLine($"{history[i].Title}");
+                Logme(Color.Gold, $"{history[i].Title}");
                 if (history[i].Title.Contains("KB"+patch))
                 {
                     return true;
@@ -243,6 +244,59 @@ namespace WannaCrypt_Detection
             {
                 Admin_Label.ForeColor = Color.Red;
                 Admin_Label.Text = "NO";
+            }
+        }
+        public static DateTime Timex = DateTime.Now;
+        public static string logtxt = Path.Combine(Program.Path, $"log-{Timex:yyyyMMdd}.txt");
+        public static void AddLog(string line, string Log, bool time = true)
+        {
+            if (!File.Exists(Log))
+            {
+                File.Create(Log);
+            }
+            try
+            {
+                TextWriter tw = new StreamWriter(Log, true);
+                var timex = $"[{DateTime.Now:G}] ";
+                if (!time)
+                    timex = "";
+
+                tw.WriteLine(timex + line);
+                tw.Close();
+            }
+            catch (Exception)
+            {
+                // Probably used by other process error
+            }
+        }
+        public void Logme(Color color, string text)
+        {
+            if (LogMe.InvokeRequired)
+            {
+                try
+                {
+                    Invoke(new Action<Color, string>(Logme), color, text);
+                }
+                catch (Exception)
+                {
+                    //look bug
+                }
+            }
+            else
+            {
+                try
+                {
+                    LogMe.SelectionColor = color;
+                    LogMe.AppendText(text + "\n");
+                    LogMe.SelectionStart = LogMe.Text.Length;
+                    LogMe.ScrollToCaret();
+                    AddLog(text, logtxt);
+                }
+                catch (Exception)
+                {
+                    //noting here
+                }
+
             }
         }
     }

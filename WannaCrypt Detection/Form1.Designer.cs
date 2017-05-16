@@ -45,6 +45,8 @@
             this.button5 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.Admin_Label = new System.Windows.Forms.Label();
+            this.LogMe = new System.Windows.Forms.RichTextBox();
+            this.label1x = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // Ceksaya
@@ -62,7 +64,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 209);
+            this.label1.Location = new System.Drawing.Point(12, 188);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(167, 37);
             this.label1.TabIndex = 1;
@@ -72,7 +74,7 @@
             // 
             this.labelapaaja.AutoSize = true;
             this.labelapaaja.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelapaaja.Location = new System.Drawing.Point(12, 246);
+            this.labelapaaja.Location = new System.Drawing.Point(12, 225);
             this.labelapaaja.Name = "labelapaaja";
             this.labelapaaja.Size = new System.Drawing.Size(291, 37);
             this.labelapaaja.TabIndex = 2;
@@ -119,7 +121,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(12, 164);
+            this.label4.Location = new System.Drawing.Point(12, 151);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(116, 37);
             this.label4.TabIndex = 7;
@@ -139,7 +141,7 @@
             // 
             this.Patch_Lable.AutoSize = true;
             this.Patch_Lable.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Patch_Lable.Location = new System.Drawing.Point(124, 164);
+            this.Patch_Lable.Location = new System.Drawing.Point(122, 151);
             this.Patch_Lable.Name = "Patch_Lable";
             this.Patch_Lable.Size = new System.Drawing.Size(66, 37);
             this.Patch_Lable.TabIndex = 9;
@@ -149,7 +151,7 @@
             // 
             this.Port_Label.AutoSize = true;
             this.Port_Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Port_Label.Location = new System.Drawing.Point(174, 209);
+            this.Port_Label.Location = new System.Drawing.Point(174, 188);
             this.Port_Label.Name = "Port_Label";
             this.Port_Label.Size = new System.Drawing.Size(66, 37);
             this.Port_Label.TabIndex = 10;
@@ -159,7 +161,7 @@
             // 
             this.WC_Label.AutoSize = true;
             this.WC_Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.WC_Label.Location = new System.Drawing.Point(297, 246);
+            this.WC_Label.Location = new System.Drawing.Point(297, 225);
             this.WC_Label.Name = "WC_Label";
             this.WC_Label.Size = new System.Drawing.Size(66, 37);
             this.WC_Label.TabIndex = 11;
@@ -214,11 +216,30 @@
             this.Admin_Label.TabIndex = 16;
             this.Admin_Label.Text = "NO";
             // 
+            // LogMe
+            // 
+            this.LogMe.Location = new System.Drawing.Point(12, 284);
+            this.LogMe.Name = "LogMe";
+            this.LogMe.Size = new System.Drawing.Size(700, 96);
+            this.LogMe.TabIndex = 17;
+            this.LogMe.Text = "";
+            // 
+            // label1x
+            // 
+            this.label1x.AutoSize = true;
+            this.label1x.Location = new System.Drawing.Point(9, 268);
+            this.label1x.Name = "label1x";
+            this.label1x.Size = new System.Drawing.Size(32, 13);
+            this.label1x.TabIndex = 18;
+            this.label1x.Text = "LOG:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(724, 290);
+            this.ClientSize = new System.Drawing.Size(724, 393);
+            this.Controls.Add(this.label1x);
+            this.Controls.Add(this.LogMe);
             this.Controls.Add(this.Admin_Label);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button5);
@@ -236,8 +257,6 @@
             this.Controls.Add(this.labelapaaja);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Ceksaya);
-            this.MaximumSize = new System.Drawing.Size(740, 329);
-            this.MinimumSize = new System.Drawing.Size(740, 329);
             this.Name = "Form1";
             this.Text = "WannaCrypt Detection";
             this.Load += new System.EventHandler(this.CekFast);
@@ -265,6 +284,8 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label Admin_Label;
+        private System.Windows.Forms.RichTextBox LogMe;
+        private System.Windows.Forms.Label label1x;
     }
 }
 
