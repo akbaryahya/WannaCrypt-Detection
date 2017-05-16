@@ -195,7 +195,7 @@ namespace WannaCrypt_Detection
 
                 ThreadHelperClass.SetText(this, WC_Label, $"{iswcgod()} %");
 
-                /*            
+                /*
                 tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
                 Windows XP: 4012598
                 Windows Vista SP2: 4012598,4012598
