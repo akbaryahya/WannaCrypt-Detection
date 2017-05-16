@@ -33,7 +33,7 @@
             this.labelapaaja = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.BlokPort_z = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.Windows_Label = new System.Windows.Forms.Label();
@@ -99,14 +99,15 @@
             this.button2.Text = "Kill and delete";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // button3
+            // BlokPort_z
             // 
-            this.button3.Location = new System.Drawing.Point(280, 42);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(93, 23);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Block Port";
-            this.button3.UseVisualStyleBackColor = true;
+            this.BlokPort_z.Location = new System.Drawing.Point(280, 42);
+            this.BlokPort_z.Name = "BlokPort_z";
+            this.BlokPort_z.Size = new System.Drawing.Size(93, 23);
+            this.BlokPort_z.TabIndex = 5;
+            this.BlokPort_z.Text = "Block Port";
+            this.BlokPort_z.UseVisualStyleBackColor = true;
+            this.BlokPort_z.Click += new System.EventHandler(this.BlokPort_z_Click);
             // 
             // button4
             // 
@@ -251,7 +252,7 @@
             this.Controls.Add(this.Windows_Label);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.BlokPort_z);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.labelapaaja);
@@ -272,7 +273,7 @@
         private System.Windows.Forms.Label labelapaaja;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button BlokPort_z;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label Windows_Label;

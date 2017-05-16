@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -39,7 +40,7 @@ namespace WannaCrypt_Detection
             }
             return isAdmin;
         }
-        static string IsWindows10()
+        static string IsWindows()
         {
             var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
             if (reg != null) return (string)reg.GetValue("ProductName");
@@ -59,67 +60,54 @@ namespace WannaCrypt_Detection
         }
         public bool FindService(string nama) 
         {
-            using (PowerShell ps = PowerShell.Create())
+            foreach (PSObject resultx in PowerShellsc("Get-Service | Select Status,Name,DisplayName"))
             {
-                ps.AddScript("Get-Service | Select Status,Name,DisplayName");//-Name *lan*
-                IAsyncResult result = ps.BeginInvoke();
-                while (result.IsCompleted == false)
+                Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
+                if (resultx.Members["Name"].Value.ToString().Contains(nama))
                 {
-                    Logme(Color.Gold, "Waiting for pipeline to finish...");
-                    Thread.Sleep(1000);
-                }
-                Logme(Color.Gold, "Finished!");
-                foreach (PSObject resultx in ps.Invoke())
-                {
-                    Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
-                    if (resultx.Members["Name"].Value.ToString().Contains(nama))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
         }
 
-        static bool IsPortClose(int port = 80)
+        //TODO: udp
+        public bool IsPortOpen(int port = 80, string host = "127.0.0.1", int timeout = 1000*20)
         {
-            using (TcpClient tcpClient = new TcpClient())
+            //http://stackoverflow.com/a/38258154
+            try
             {
-                try
+                using (var client = new TcpClient())
                 {
-                    tcpClient.Connect("127.0.0.1", port);
-                    return false;
+                    var result = client.BeginConnect(host, port, null, null);
+                    var success = result.AsyncWaitHandle.WaitOne(timeout);
+                    if (!success)
+                    {
+                        return false;
+                    }
+                    client.EndConnect(result);
                 }
-                catch (Exception)
-                {
-                    //noting here
-                }
+
+            }
+            catch
+            {
+                return false;
             }
             return true;
         }
-        
+
         public bool IsSmBnew()
         {
             //or use https://github.com/cseelye/windiskhelper/blob/28be60045e79c557eb33558ee65faf3e7d84629c/MicrosoftInitiator.cs#L3855
-            using (PowerShell ps = PowerShell.Create())
+            foreach (PSObject resultx in PowerShellsc("Get-SmbServerConfiguration | Select EnableSMB1Protocol, EnableSMB2Protocol"))
             {
-                ps.AddScript("Get-SmbServerConfiguration | Select EnableSMB1Protocol, EnableSMB2Protocol");
-                IAsyncResult result = ps.BeginInvoke();
-                while (result.IsCompleted == false)
+                Logme(Color.Gold, $"{resultx.Members["EnableSMB1Protocol"].Value}|{resultx.Members["EnableSMB2Protocol"].Value}");
+                if (resultx.Members["EnableSMB1Protocol"].Value.ToString() == "True" && resultx.Members["EnableSMB2Protocol"].Value.ToString() == "True")
                 {
-                    Logme(Color.Gold, "Waiting for pipeline to finish...");
-                    Thread.Sleep(1000);
-                }
-                Logme(Color.Gold, "Finished!");
-                foreach (PSObject resultx in ps.Invoke())
-                {
-                    Logme(Color.Gold, $"{resultx.Members["EnableSMB1Protocol"].Value}|{resultx.Members["EnableSMB2Protocol"].Value}");
-                    if (resultx.Members["EnableSMB1Protocol"].Value.ToString() == "True" && resultx.Members["EnableSMB2Protocol"].Value.ToString() == "True")
-                    {
-                        return true;
-                    }
+                    return true; //Windows 10
                 }
             }
+            //Windows 7
             if (FindService("LanmanServer"))
             {
                 return true;
@@ -168,7 +156,7 @@ namespace WannaCrypt_Detection
             ThreadPool.QueueUserWorkItem(state =>
             {
                 //cek windows, TODO: cek bit
-                var ismy = IsWindows10();
+                var ismy = IsWindows();
                 
                 ThreadHelperClass.SetText(this, Windows_Label, $"{ismy} ({Isx64()})");
                 ThreadHelperClass.SetColor(this, Windows_Label, ismy.Contains("Windows 10") ? Color.Green : Color.Red);
@@ -187,7 +175,7 @@ namespace WannaCrypt_Detection
                 }
 
                 //cek port
-                ThreadHelperClass.SetText(this, Port_Label, $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}");
+                ThreadHelperClass.SetText(this, Port_Label, $"139 {!IsPortOpen(139)} | 445 {!IsPortOpen(445)} | 3389 {!IsPortOpen(3389)}");
 
                 ThreadHelperClass.SetText(this, Patch_Lable, $"{Ispatchsafe()} %");
 
@@ -308,6 +296,71 @@ namespace WannaCrypt_Detection
                     //noting here
                 }
 
+            }
+        }
+
+        public Collection<PSObject> PowerShellsc(string sc)
+        {
+            using (PowerShell ps = PowerShell.Create())
+            {
+                ps.AddScript(sc);
+                IAsyncResult result = ps.BeginInvoke();
+                while (result.IsCompleted == false)
+                {
+                    Logme(Color.Gold, "Waiting for pipeline to finish...");
+                    Thread.Sleep(1000);
+                }
+                Logme(Color.Gold, "Finished!");
+                var kk = ps.Invoke();
+                return kk;
+            }
+        }
+
+        public void startpatchmbs()
+        {
+            var ismy = IsWindows();
+            if (ismy.Contains("Windows 10"))
+            {
+               PowerShellsc("Set-SMBServerConfiguration -EnableSMB1Protocol:$false -Confirm:$false");
+               PowerShellsc("Set-SMBServerConfiguration -EnableSMB2Protocol:$false -Confirm:$false");
+               PowerShellsc("Set-SMBServerConfiguration -EnableSMB3Protocol:$false -Confirm:$false");
+            }
+            else
+            {
+                //later
+            }
+        }
+
+        private void BlokPort_z_Click(object sender, EventArgs e)
+        {
+            //TODO: if patch ok
+            try
+            {
+                //buat bat
+                var w = new StreamWriter(Program.Path + @"\patchsmb.bat");
+                w.WriteLine("@echo off");
+                w.WriteLine("echo SmbPatch by xcanwin");
+
+                //blok
+                w.WriteLine("echo blok...");
+                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchIntcp dir=in protocol=tcp localport=139,445,3389 action=block");
+                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchOuttt dir=out protocol=tcp remoteport=139,445,3389 action=block");
+                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchInudp dir=in protocol=udp localport=137,138 action=block");
+                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchouudp dir=out protocol=udp remoteport=137,138 action=block");
+
+                //w.WriteLine("pause");
+
+                //hapus file
+                w.WriteLine("echo del tmp file...");
+                w.WriteLine("del patchsmb.bat");
+                w.Close();
+
+                //open bat
+                Process.Start($@"{Program.Path}\patchsmb.bat");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
     }
