@@ -193,7 +193,7 @@ namespace WannaCrypt_Detection
 
                 ThreadHelperClass.SetText(this, Patch_Lable, $"{ispatchsafe()} %");
 
-                ThreadHelperClass.SetText(this, WC_Label, $"{iswcgod()} %");
+                ThreadHelperClass.SetText(this, WC_Label, $"{iswcgod()} %"); 
 
                 /*
                 tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
