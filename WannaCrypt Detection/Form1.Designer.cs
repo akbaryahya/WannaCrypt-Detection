@@ -42,7 +42,7 @@
             this.WC_Label = new System.Windows.Forms.Label();
             this.SMB_Lable = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.button5 = new System.Windows.Forms.Button();
+            this.smboff = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.Admin_Label = new System.Windows.Forms.Label();
             this.LogMe = new System.Windows.Forms.RichTextBox();
@@ -188,14 +188,15 @@
             this.label10.TabIndex = 12;
             this.label10.Text = "SMB OFF?";
             // 
-            // button5
+            // smboff
             // 
-            this.button5.Location = new System.Drawing.Point(471, 42);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(84, 23);
-            this.button5.TabIndex = 14;
-            this.button5.Text = "Turn off SMB";
-            this.button5.UseVisualStyleBackColor = true;
+            this.smboff.Location = new System.Drawing.Point(471, 42);
+            this.smboff.Name = "smboff";
+            this.smboff.Size = new System.Drawing.Size(84, 23);
+            this.smboff.TabIndex = 14;
+            this.smboff.Text = "Turn off SMB";
+            this.smboff.UseVisualStyleBackColor = true;
+            this.smboff.Click += new System.EventHandler(this.smboff_Click);
             // 
             // label5
             // 
@@ -243,7 +244,7 @@
             this.Controls.Add(this.LogMe);
             this.Controls.Add(this.Admin_Label);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.button5);
+            this.Controls.Add(this.smboff);
             this.Controls.Add(this.SMB_Lable);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.WC_Label);
@@ -282,7 +283,7 @@
         private System.Windows.Forms.Label WC_Label;
         private System.Windows.Forms.Label SMB_Lable;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button smboff;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label Admin_Label;
         private System.Windows.Forms.RichTextBox LogMe;

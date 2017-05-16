@@ -65,7 +65,7 @@ namespace WannaCrypt_Detection
                 Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
                 if (resultx.Members["Name"].Value.ToString().Contains(nama))
                 {
-                    return true;
+                    return (string) resultx.Members["Status"].Value == "Running";
                 }
             }
             return false;
@@ -96,23 +96,19 @@ namespace WannaCrypt_Detection
             return true;
         }
 
-        public bool IsSmBnew()
+        public bool IsSmBstop()
         {
             //or use https://github.com/cseelye/windiskhelper/blob/28be60045e79c557eb33558ee65faf3e7d84629c/MicrosoftInitiator.cs#L3855
             foreach (PSObject resultx in PowerShellsc("Get-SmbServerConfiguration | Select EnableSMB1Protocol, EnableSMB2Protocol"))
             {
                 Logme(Color.Gold, $"{resultx.Members["EnableSMB1Protocol"].Value}|{resultx.Members["EnableSMB2Protocol"].Value}");
-                if (resultx.Members["EnableSMB1Protocol"].Value.ToString() == "True" && resultx.Members["EnableSMB2Protocol"].Value.ToString() == "True")
+                if (resultx.Members["EnableSMB1Protocol"].Value.ToString() == "False" && resultx.Members["EnableSMB2Protocol"].Value.ToString() == "False")
                 {
                     return true; //Windows 10
                 }
             }
             //Windows 7
-            if (FindService("LanmanServer"))
-            {
-                return true;
-            }
-            return false;
+            return !FindService("LanmanServer");
         }
         public bool FindUpdates(string patch)
         {
@@ -155,15 +151,15 @@ namespace WannaCrypt_Detection
             Ceksaya.Enabled = false;
             ThreadPool.QueueUserWorkItem(state =>
             {
-                //cek windows, TODO: cek bit
+                //cek windows
                 var ismy = IsWindows();
                 
                 ThreadHelperClass.SetText(this, Windows_Label, $"{ismy} ({Isx64()})");
                 ThreadHelperClass.SetColor(this, Windows_Label, ismy.Contains("Windows 10") ? Color.Green : Color.Red);
 
-                //cek SMB, TODO: cek windows 7
-                var ismb = IsSmBnew();
-                if (!ismb)
+                //cek SMB
+                var ismb = IsSmBstop();
+                if (ismb)
                 {
                     ThreadHelperClass.SetText(this, SMB_Lable, "YES");
                     ThreadHelperClass.SetColor(this, SMB_Lable, Color.Green);
@@ -316,7 +312,7 @@ namespace WannaCrypt_Detection
             }
         }
 
-        public void startpatchmbs()
+        public void Startpatchmbs()
         {
             var ismy = IsWindows();
             if (ismy.Contains("Windows 10"))
@@ -362,6 +358,11 @@ namespace WannaCrypt_Detection
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void smboff_Click(object sender, EventArgs e)
+        {
+            Startpatchmbs();
         }
     }
     public static class ThreadHelperClass
