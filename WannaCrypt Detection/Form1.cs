@@ -156,51 +156,60 @@ namespace WannaCrypt_Detection
             }
             return false;
         }
+
+        public void startcek()
+        {
+            ThreadPool.QueueUserWorkItem(state =>
+            {
+                //cek windows, TODO: cek bit
+                var ismy = IsWindows10();
+                if (ismy.Contains("Windows 10"))
+                {
+                    ThreadHelperClass.SetText(this, Windows_Label, ismy);
+                    ThreadHelperClass.SetColor(this,Windows_Label,Color.Green);
+                }
+                else
+                {
+                    ThreadHelperClass.SetText(this, Windows_Label, ismy);
+                    ThreadHelperClass.SetColor(this, Windows_Label, Color.Red);
+                }
+
+                //cek SMB, TODO: cek windows 7
+                var ismb = IsSMBnew();
+                if (!ismb)
+                {
+                    ThreadHelperClass.SetText(this, Windows_Label, "YES");
+                    ThreadHelperClass.SetColor(this, Windows_Label, Color.Green);
+                }
+                else
+                {
+                    ThreadHelperClass.SetText(this, Windows_Label, "NO");
+                    ThreadHelperClass.SetColor(this, Windows_Label, Color.Red);
+                }
+
+                //cek port
+                ThreadHelperClass.SetText(this, Windows_Label, $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}");
+
+                ThreadHelperClass.SetText(this, Windows_Label, $"{ispatchsafe()} %");
+
+                ThreadHelperClass.SetText(this, Windows_Label, $"{iswcgod()} %");
+
+                /*            
+                tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
+                Windows XP: 4012598
+                Windows Vista SP2: 4012598,4012598
+                Windows Server 2008: 4012598
+                Windows 7/Windows Server 2008: 4012212,4012215
+                Windows 8.1/Windows Server 2012/Windows Server 2012 R2: 4012213,4012216 
+                Windows 10: 4012606,4013198,4013429
+                Windows Server 2016: 4013429
+                */
+            });
+        }
+
         private void Ceksaya_Click(object sender, EventArgs e)
         {
-            //cek windows, TODO: cek bit
-            var ismy = IsWindows10();
-            if (ismy.Contains("Windows 10"))
-            {
-                Windows_Label.ForeColor = Color.Green;
-                Windows_Label.Text = ismy;
-            }
-            else
-            {
-                Windows_Label.ForeColor = Color.Red;
-                Windows_Label.Text = ismy;
-            }
-
-            //cek SMB, TODO: cek windows 7
-            var ismb = IsSMBnew();
-            if (!ismb)
-            {
-                SMB_Lable.ForeColor = Color.Green;
-                SMB_Lable.Text = "YES";
-            }
-            else
-            {
-                SMB_Lable.ForeColor = Color.Red;
-                SMB_Lable.Text = "NO";
-            }
-
-            //cek port
-            Port_Label.Text = $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}";
-
-            Patch_Lable.Text = $"{ispatchsafe()} %";
-
-            WC_Label.Text = $"{iswcgod()} %";
-
-            /*            
-            tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
-            Windows XP: 4012598
-            Windows Vista SP2: 4012598,4012598
-            Windows Server 2008: 4012598
-            Windows 7/Windows Server 2008: 4012212,4012215
-            Windows 8.1/Windows Server 2012/Windows Server 2012 R2: 4012213,4012216 
-            Windows 10: 4012606,4013198,4013429
-            Windows Server 2016: 4013429
-            */
+            startcek();
         }
 
         public int ispatchsafe()
@@ -297,6 +306,36 @@ namespace WannaCrypt_Detection
                     //noting here
                 }
 
+            }
+        }
+    }
+    public static class ThreadHelperClass
+    {
+        //http://stackoverflow.com/a/15831292
+        delegate void SetTextCallback(Form f, Control ctrl, string text);
+        delegate void SetColorCallback(Form f, Control ctrl, Color text);
+        public static void SetText(Form form, Control ctrl, string text)
+        {
+            if (ctrl.InvokeRequired)
+            {
+                SetTextCallback d = SetText;
+                form.Invoke(d, form, ctrl, text);
+            }
+            else
+            {
+                ctrl.Text = text;
+            }
+        }
+        public static void SetColor(Form form, Control ctrl, Color text)
+        {
+            if (ctrl.InvokeRequired)
+            {
+                SetColorCallback d = SetColor;
+                form.Invoke(d, form, ctrl, text);
+            }
+            else
+            {
+                ctrl.ForeColor = text;
             }
         }
     }
