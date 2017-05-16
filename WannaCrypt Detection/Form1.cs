@@ -157,6 +157,11 @@ namespace WannaCrypt_Detection
             return false;
         }
 
+        public string Isx64() 
+        {
+            return Environment.Is64BitOperatingSystem ? "64bit" : "32bit";
+        }
+
         public void Startcek()
         {
             Ceksaya.Enabled = false;
@@ -164,16 +169,9 @@ namespace WannaCrypt_Detection
             {
                 //cek windows, TODO: cek bit
                 var ismy = IsWindows10();
-                if (ismy.Contains("Windows 10"))
-                {
-                    ThreadHelperClass.SetText(this, Windows_Label, ismy);
-                    ThreadHelperClass.SetColor(this,Windows_Label,Color.Green);
-                }
-                else
-                {
-                    ThreadHelperClass.SetText(this, Windows_Label, ismy);
-                    ThreadHelperClass.SetColor(this, Windows_Label, Color.Red);
-                }
+                
+                ThreadHelperClass.SetText(this, Windows_Label, $"{ismy} ({Isx64()})");
+                ThreadHelperClass.SetColor(this, Windows_Label, ismy.Contains("Windows 10") ? Color.Green : Color.Red);
 
                 //cek SMB, TODO: cek windows 7
                 var ismb = IsSmBnew();
