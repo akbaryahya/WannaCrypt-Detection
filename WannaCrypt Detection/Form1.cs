@@ -65,7 +65,7 @@ namespace WannaCrypt_Detection
                 Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
                 if (resultx.Members["Name"].Value.ToString().Contains(nama))
                 {
-                    return (string) resultx.Members["Status"].Value == "Running";
+                    return ReferenceEquals(resultx.Members["Status"].Value, "Running");
                 }
             }
             return false;
@@ -319,7 +319,6 @@ namespace WannaCrypt_Detection
             {
                PowerShellsc("Set-SMBServerConfiguration -EnableSMB1Protocol:$false -Confirm:$false");
                PowerShellsc("Set-SMBServerConfiguration -EnableSMB2Protocol:$false -Confirm:$false");
-               PowerShellsc("Set-SMBServerConfiguration -EnableSMB3Protocol:$false -Confirm:$false");
             }
             else
             {
