@@ -159,6 +159,7 @@ namespace WannaCrypt_Detection
 
         public void startcek()
         {
+            Ceksaya.Enabled = false;
             ThreadPool.QueueUserWorkItem(state =>
             {
                 //cek windows, TODO: cek bit
@@ -178,21 +179,21 @@ namespace WannaCrypt_Detection
                 var ismb = IsSMBnew();
                 if (!ismb)
                 {
-                    ThreadHelperClass.SetText(this, Windows_Label, "YES");
-                    ThreadHelperClass.SetColor(this, Windows_Label, Color.Green);
+                    ThreadHelperClass.SetText(this, SMB_Lable, "YES");
+                    ThreadHelperClass.SetColor(this, SMB_Lable, Color.Green);
                 }
                 else
                 {
-                    ThreadHelperClass.SetText(this, Windows_Label, "NO");
-                    ThreadHelperClass.SetColor(this, Windows_Label, Color.Red);
+                    ThreadHelperClass.SetText(this, SMB_Lable, "NO");
+                    ThreadHelperClass.SetColor(this, SMB_Lable, Color.Red);
                 }
 
                 //cek port
-                ThreadHelperClass.SetText(this, Windows_Label, $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}");
+                ThreadHelperClass.SetText(this, Port_Label, $"139 {IsPortClose(139)} | 445 {IsPortClose(445)} | 3389 {IsPortClose(3389)}");
 
-                ThreadHelperClass.SetText(this, Windows_Label, $"{ispatchsafe()} %");
+                ThreadHelperClass.SetText(this, Patch_Lable, $"{ispatchsafe()} %");
 
-                ThreadHelperClass.SetText(this, Windows_Label, $"{iswcgod()} %");
+                ThreadHelperClass.SetText(this, WC_Label, $"{iswcgod()} %");
 
                 /*            
                 tasksche,mssecsvc,taskdl,taskse,WanaDecryptor,Taskse
@@ -204,6 +205,9 @@ namespace WannaCrypt_Detection
                 Windows 10: 4012606,4013198,4013429
                 Windows Server 2016: 4013429
                 */
+
+                //END
+                Ceksaya.BeginInvoke((Action)delegate { Ceksaya.Enabled = true; });
             });
         }
 
