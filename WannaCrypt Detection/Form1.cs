@@ -389,7 +389,7 @@ namespace WannaCrypt_Detection
             }
         }
 
-        public bool SetReg(string sub,string name,string value)
+        public bool SetReg(string sub, string name, string value)
         {
             var key = Registry.LocalMachine.CreateSubKey(sub);
             if (key != null)
