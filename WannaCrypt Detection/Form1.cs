@@ -107,7 +107,7 @@ namespace WannaCrypt_Detection
                 Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
                 if (resultx.Members["Name"].Value.ToString().Contains(nama))
                 {
-                    if ((resultx.Members["Status"].Value).ToString().Contains("Running"))
+                    if (resultx.Members["Status"].Value.ToString().Contains("Running"))
                     {
                         return true;
                     }
@@ -428,6 +428,10 @@ namespace WannaCrypt_Detection
             //disable SMBv2 and SMBv3
             ExecuteCmd("sc.exe config lanmanworkstation depend= bowser/mrxsmb10/nsi");
             ExecuteCmd("sc.exe config mrxsmb20 start= disabled");
+
+            //disable and stop LanmanServer?
+            ExecuteCmd("sc.exe config \"LanmanServer\" start= disabled");
+            ExecuteCmd("sc.exe stop \"LanmanServer\"");
 
             Logme(Color.Gold, "Please restart your pc to see results");
         }
