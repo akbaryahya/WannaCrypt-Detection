@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System.Management.Automation;
 using System.Net.Sockets;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using WUApiLib;
 // ReSharper disable LocalizableElement
@@ -45,6 +46,15 @@ namespace WannaCrypt_Detection
             var reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
             if (reg != null) return (string)reg.GetValue("ProductName");
             return "Not known";
+        }
+        private static string InternalReadAllText(string path, Encoding encoding)
+        {
+            string result;
+            using (StreamReader streamReader = new StreamReader(path, encoding))
+            {
+                result = streamReader.ReadToEnd();
+            }
+            return result;
         }
         public bool IsProcessOpen(string name)
         {
@@ -274,7 +284,7 @@ namespace WannaCrypt_Detection
                 }
                 catch (Exception)
                 {
-                    //look bug
+                    //noting here
                 }
             }
             else
@@ -355,13 +365,46 @@ namespace WannaCrypt_Detection
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                Logme(Color.Red, ex.ToString());
             }
         }
 
         private void smboff_Click(object sender, EventArgs e)
         {
             Startpatchmbs();
+        }
+
+        private void upkill_Click(object sender, EventArgs e)
+        {
+            var host = @"C:\Windows\System32\drivers\etc\hosts";
+            try
+            {
+                if (File.Exists(host))
+                {
+                    string readText = InternalReadAllText(host,Encoding.UTF8);
+                    if (readText != null)
+                    {
+                        if (!readText.Contains("216.58.197.132"))
+                        {
+                            File.AppendAllText(host, "216.58.197.132 www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 www.ifferfsodp9ifjaposdfjhgosurijfaewrwergwea.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 ifferfsodp9ifjaposdfjhgosurijfaewrwergwea.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 www.iuqssfsodp9ifjaposdfjhgosurijfaewrwergwea.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 iuqssfsodp9ifjaposdfjhgosurijfaewrwergwea.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 www.ayylmaotjhsstasdfasdfasdfasdfasdfasdfasdf.com" + Environment.NewLine);
+                            File.AppendAllText(host, "216.58.197.132 ayylmaotjhsstasdfasdfasdfasdfasdfasdfasdf.com" + Environment.NewLine);
+                            Logme(Color.Green, "OK");
+                            return;
+                        }
+                    }
+                }
+                Logme(Color.Gold, "No host found or Has been in patch");
+            }
+            catch (Exception ex)
+            {
+                Logme(Color.Red, ex.ToString());
+            }
         }
     }
     public static class ThreadHelperClass

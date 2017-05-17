@@ -47,6 +47,7 @@
             this.Admin_Label = new System.Windows.Forms.Label();
             this.LogMe = new System.Windows.Forms.RichTextBox();
             this.label1x = new System.Windows.Forms.Label();
+            this.upkill = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Ceksaya
@@ -111,7 +112,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(379, 42);
+            this.button4.Location = new System.Drawing.Point(467, 42);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(86, 23);
             this.button4.TabIndex = 6;
@@ -190,7 +191,7 @@
             // 
             // smboff
             // 
-            this.smboff.Location = new System.Drawing.Point(471, 42);
+            this.smboff.Location = new System.Drawing.Point(559, 42);
             this.smboff.Name = "smboff";
             this.smboff.Size = new System.Drawing.Size(84, 23);
             this.smboff.TabIndex = 14;
@@ -235,11 +236,22 @@
             this.label1x.TabIndex = 18;
             this.label1x.Text = "LOG:";
             // 
+            // upkill
+            // 
+            this.upkill.Location = new System.Drawing.Point(379, 42);
+            this.upkill.Name = "upkill";
+            this.upkill.Size = new System.Drawing.Size(82, 23);
+            this.upkill.TabIndex = 19;
+            this.upkill.Text = "Up Kill-switch";
+            this.upkill.UseVisualStyleBackColor = true;
+            this.upkill.Click += new System.EventHandler(this.upkill_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(759, 393);
+            this.Controls.Add(this.upkill);
             this.Controls.Add(this.label1x);
             this.Controls.Add(this.LogMe);
             this.Controls.Add(this.Admin_Label);
@@ -288,6 +300,7 @@
         private System.Windows.Forms.Label Admin_Label;
         private System.Windows.Forms.RichTextBox LogMe;
         private System.Windows.Forms.Label label1x;
+        private System.Windows.Forms.Button upkill;
     }
 }
 
