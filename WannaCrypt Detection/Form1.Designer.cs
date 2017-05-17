@@ -220,9 +220,9 @@
             // 
             // LogMe
             // 
-            this.LogMe.Location = new System.Drawing.Point(12, 284);
+            this.LogMe.Location = new System.Drawing.Point(-2, 285);
             this.LogMe.Name = "LogMe";
-            this.LogMe.Size = new System.Drawing.Size(700, 96);
+            this.LogMe.Size = new System.Drawing.Size(763, 110);
             this.LogMe.TabIndex = 17;
             this.LogMe.Text = "";
             // 
@@ -239,7 +239,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(724, 393);
+            this.ClientSize = new System.Drawing.Size(759, 393);
             this.Controls.Add(this.label1x);
             this.Controls.Add(this.LogMe);
             this.Controls.Add(this.Admin_Label);
@@ -260,7 +260,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Ceksaya);
             this.Name = "Form1";
-            this.Text = "WannaCrypt Detection";
+            this.Text = "WannaCry Detection";
             this.Load += new System.EventHandler(this.CekFast);
             this.ResumeLayout(false);
             this.PerformLayout();
