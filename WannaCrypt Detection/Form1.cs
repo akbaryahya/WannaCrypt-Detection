@@ -376,7 +376,7 @@ namespace WannaCrypt_Detection
 
         private void upkill_Click(object sender, EventArgs e)
         {
-            var host = @"C:\Windows\System32\drivers\etc\hosts";
+            var host = $@"{Environment.SystemDirectory}\drivers\etc\hosts";
             try
             {
                 if (File.Exists(host))
