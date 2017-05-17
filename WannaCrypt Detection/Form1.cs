@@ -389,7 +389,7 @@ namespace WannaCrypt_Detection
             }
         }
 
-        public bool SetReg(string sub, string name, string value)
+        public bool SetRegLM(string sub, string name, string value)
         {
             var key = Registry.LocalMachine.CreateSubKey(sub);
             if (key != null)
@@ -411,9 +411,9 @@ namespace WannaCrypt_Detection
             }
             else
             {
-                var locae = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters";
-                SetReg(locae, "SMB1", "0");
-                SetReg(locae, "SMB2", "0");
+                var locae = @"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters";
+                SetRegLM(locae, "SMB1", "0");
+                SetRegLM(locae, "SMB2", "0");
                 Logme(Color.Gold, "Please restart your pc to see results");
             }
         }
