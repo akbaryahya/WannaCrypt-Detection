@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Management.Automation;
@@ -47,7 +48,7 @@ namespace WannaCrypt_Detection
             if (reg != null) return (string)reg.GetValue("ProductName");
             return "Not known";
         }
-        private static string InternalReadAllText(string path, Encoding encoding)
+        public string InternalReadAllText(string path, Encoding encoding)
         {
             string result;
             using (StreamReader streamReader = new StreamReader(path, encoding))
@@ -68,6 +69,37 @@ namespace WannaCrypt_Detection
             }
             return false;
         }
+        public bool KillPs(string id, bool waitForExit = false) 
+        {
+            var isme = Process.GetProcessesByName(id);
+            if (isme.Any())
+            {
+                foreach (var p in isme)
+                {
+                    if (p == null || p.HasExited) return false;
+
+                    p.Kill();
+                    if (waitForExit)
+                    {
+                        p.WaitForExit();
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+        public string GetNamePs(string id)
+        {
+            var isme = Process.GetProcessesByName(id);
+            if (isme.Any())
+            {
+                foreach (var p in isme)
+                {
+                    return p.MainModule.FileName;
+                }
+            }
+            return "";
+        }
         public bool FindService(string nama) 
         {
             foreach (PSObject resultx in PowerShellsc("Get-Service | Select Status,Name,DisplayName"))
@@ -75,7 +107,10 @@ namespace WannaCrypt_Detection
                 Logme(Color.Gold, $"{resultx.Members["Status"].Value}|{resultx.Members["Name"].Value}|{resultx.Members["DisplayName"].Value}");
                 if (resultx.Members["Name"].Value.ToString().Contains(nama))
                 {
-                    return ReferenceEquals(resultx.Members["Status"].Value, "Running");
+                    if ((resultx.Members["Status"].Value).ToString().Contains("Running"))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -207,33 +242,32 @@ namespace WannaCrypt_Detection
         {
             Startcek();
         }
-
+        List<string> kb = new List<string>(new[] { "4012212", "4012213", "4012214", "4012215", "4012216", "4012217", "4012598", "4012606", "4013198", "4013429", "4015217", "4015438", "4015549", "4015550", "4015551", "4015552", "4015553", "4016635", "4019215", "4019216", "4019264", "4019472" });
+        List<string> killz = new List<string>(new[] { "mssecsvc", "tasksche", "@WanaDecryptor@", "taskdl", "Taskse" });
         public int Ispatchsafe()
         {
-            List<string> listcek = new List<string>(new[] { "4012212", "4012213", "4012214", "4012215", "4012216", "4012217", "4012598", "4012606", "4013198", "4013429", "4015217", "4015438", "4015549", "4015550", "4015551", "4015552", "4015553", "4016635" , "4019215", "4019216", "4019264", "4019472"});
             var isme = 0;
-            foreach (var k in listcek) 
+            foreach (var k in kb) 
             {
                 if (FindUpdates(k))
                 {
                     isme++;
                 }
             }
-            var relp = Convert.ToDouble(isme) / Convert.ToDouble(listcek.Count) * 100;
+            var relp = Convert.ToDouble(isme) / Convert.ToDouble(kb.Count) * 100;
             return (int)Math.Floor(relp); 
         }
         public int Iswcgod()
         {
-            List<string> listcek = new List<string>(new[] { "mssecsvc", "tasksche", "@WanaDecryptor@", "taskdl", "Taskse"});
             var isme = 0;
-            foreach (var k in listcek)
+            foreach (var k in killz)
             {
                 if (IsProcessOpen(k))
                 {
                     isme++;
                 }
             }
-            var relp = Convert.ToDouble(isme) / Convert.ToDouble(listcek.Count) * 100;
+            var relp = Convert.ToDouble(isme) / Convert.ToDouble(killz.Count) * 100;
             return (int)Math.Floor(relp);
         }
 
@@ -322,20 +356,6 @@ namespace WannaCrypt_Detection
             }
         }
 
-        public void Startpatchmbs()
-        {
-            var ismy = IsWindows();
-            if (ismy.Contains("Windows 10"))
-            {
-               PowerShellsc("Set-SMBServerConfiguration -EnableSMB1Protocol:$false -Confirm:$false");
-               PowerShellsc("Set-SMBServerConfiguration -EnableSMB2Protocol:$false -Confirm:$false");
-            }
-            else
-            {
-                //later
-            }
-        }
-
         private void BlokPort_z_Click(object sender, EventArgs e)
         {
             //TODO: if patch ok
@@ -369,9 +389,33 @@ namespace WannaCrypt_Detection
             }
         }
 
+        public bool SetReg(string sub,string name,string value)
+        {
+            var key = Registry.LocalMachine.CreateSubKey(sub);
+            if (key != null)
+            {
+                key.SetValue(name, value);
+                key.Close();
+                return true;
+            }
+            return false;
+        }
+
         private void smboff_Click(object sender, EventArgs e)
         {
-            Startpatchmbs();
+            var ismy = IsWindows();
+            if (!ismy.ContainsAny("Windows XP", "Windows 7", "Windows Server 2008 R2", "Windows Vista", "Windows Server 2008"))
+            {
+                PowerShellsc("Set-SMBServerConfiguration -EnableSMB1Protocol:$false -Confirm:$false");
+                PowerShellsc("Set-SMBServerConfiguration -EnableSMB2Protocol:$false -Confirm:$false");
+            }
+            else
+            {
+                var locae = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters";
+                SetReg(locae, "SMB1", "0");
+                SetReg(locae, "SMB2", "0");
+                Logme(Color.Gold, "Please restart your pc to see results");
+            }
         }
 
         private void upkill_Click(object sender, EventArgs e)
@@ -406,7 +450,42 @@ namespace WannaCrypt_Detection
                 Logme(Color.Red, ex.ToString());
             }
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            foreach (var x in killz) 
+            {
+                //TODO: hapus file
+                Logme(Color.Gold, $"{x}: {GetNamePs(x)}");
+
+                //kill
+                if (KillPs(x))
+                {
+                    Logme(Color.Green, $"{x} Have been killed");
+                }
+                else
+                {
+                    Logme(Color.Red, $"{x} Have been killed or not?");
+                }
+            }
+        }
     }
+
+    public static class StringExtensions
+    {
+        //http://stackoverflow.com/a/3519555
+        public static bool ContainsAny(this string haystack, params string[] needles)
+        {
+            foreach (string needle in needles)
+            {
+                if (haystack.Contains(needle))
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
     public static class ThreadHelperClass
     {
         //http://stackoverflow.com/a/15831292
