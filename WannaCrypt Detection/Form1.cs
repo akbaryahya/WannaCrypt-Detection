@@ -242,32 +242,33 @@ namespace WannaCrypt_Detection
         {
             Startcek();
         }
-        List<string> kb = new List<string>(new[] { "4012212", "4012213", "4012214", "4012215", "4012216", "4012217", "4012598", "4012606", "4013198", "4013429", "4015217", "4015438", "4015549", "4015550", "4015551", "4015552", "4015553", "4016635", "4019215", "4019216", "4019264", "4019472" });
-        List<string> killz = new List<string>(new[] { "mssecsvc", "tasksche", "@WanaDecryptor@", "taskdl", "Taskse" });
+
+        readonly List<string> _kb = new List<string>(new[] { "4012212", "4012213", "4012214", "4012215", "4012216", "4012217", "4012598", "4012606", "4013198", "4013429", "4015217", "4015438", "4015549", "4015550", "4015551", "4015552", "4015553", "4016635", "4019215", "4019216", "4019264", "4019472" });
+        readonly List<string> _killz = new List<string>(new[] { "mssecsvc", "tasksche", "@WanaDecryptor@", "taskdl", "Taskse" });
         public int Ispatchsafe()
         {
             var isme = 0;
-            foreach (var k in kb) 
+            foreach (var k in _kb) 
             {
                 if (FindUpdates(k))
                 {
                     isme++;
                 }
             }
-            var relp = Convert.ToDouble(isme) / Convert.ToDouble(kb.Count) * 100;
+            var relp = Convert.ToDouble(isme) / Convert.ToDouble(_kb.Count) * 100;
             return (int)Math.Floor(relp); 
         }
         public int Iswcgod()
         {
             var isme = 0;
-            foreach (var k in killz)
+            foreach (var k in _killz)
             {
                 if (IsProcessOpen(k))
                 {
                     isme++;
                 }
             }
-            var relp = Convert.ToDouble(isme) / Convert.ToDouble(killz.Count) * 100;
+            var relp = Convert.ToDouble(isme) / Convert.ToDouble(_killz.Count) * 100;
             return (int)Math.Floor(relp);
         }
 
@@ -359,37 +360,15 @@ namespace WannaCrypt_Detection
         private void BlokPort_z_Click(object sender, EventArgs e)
         {
             //TODO: if patch ok
-            try
-            {
-                //buat bat
-                var w = new StreamWriter(Program.Path + @"\patchsmb.bat");
-                w.WriteLine("@echo off");
-                w.WriteLine("echo SmbPatch by xcanwin");
-
-                //blok
-                w.WriteLine("echo blok...");
-                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchIntcp dir=in protocol=tcp localport=139,445,3389 action=block");
-                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchOuttt dir=out protocol=tcp remoteport=139,445,3389 action=block");
-                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchInudp dir=in protocol=udp localport=137,138 action=block");
-                w.WriteLine("netsh advfirewall firewall add rule name=SmbPatchouudp dir=out protocol=udp remoteport=137,138 action=block");
-
-                //w.WriteLine("pause");
-
-                //hapus file
-                w.WriteLine("echo del tmp file...");
-                w.WriteLine("del patchsmb.bat");
-                w.Close();
-
-                //open bat
-                Process.Start($@"{Program.Path}\patchsmb.bat");
-            }
-            catch (Exception ex)
-            {
-                Logme(Color.Red, ex.ToString());
-            }
+            //netsh advfirewall firewall show rule name="a"
+            ExecuteCmd("netsh advfirewall firewall add rule name=SmbPatchIntcp dir=in protocol=tcp localport=139,445,3389 action=block");
+            ExecuteCmd("netsh advfirewall firewall add rule name=SmbPatchOuttt dir=out protocol=tcp remoteport=139,445,3389 action=block");
+            ExecuteCmd("netsh advfirewall firewall add rule name=SmbPatchInudp dir=in protocol=udp localport=137,138 action=block");
+            ExecuteCmd("netsh advfirewall firewall add rule name=SmbPatchouudp dir=out protocol=udp remoteport=137,138 action=block");
+            Logme(Color.Green, "Done blok port!");
         }
 
-        public bool SetRegLM(string sub, string name, string value)
+        public bool SetRegLm(string sub, string name, string value)
         {
             var key = Registry.LocalMachine.CreateSubKey(sub);
             if (key != null)
@@ -400,9 +379,35 @@ namespace WannaCrypt_Detection
             }
             return false;
         }
-
+        private static string ExecuteCmd(string command)
+        {
+            //https://github.com/L7D/WannaCry-Ransomeware-PortBlocker/blob/master/Firewall.cs#L10
+            ProcessStartInfo proInfo = new ProcessStartInfo()
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                FileName = $@"{Environment.SystemDirectory}\cmd.exe",
+                Verb = "runas"
+            };
+            Process pro = new Process
+            {
+                StartInfo = proInfo
+            };
+            pro.Start();
+            pro.StandardInput.WriteLine(command);
+            pro.StandardInput.Close();
+            string resultValue = pro.StandardOutput.ReadToEnd();
+            pro.WaitForExit();
+            pro.Close();
+            resultValue = resultValue.Substring(resultValue.IndexOf(command, StringComparison.Ordinal) + command.Length + 2);
+            return resultValue;
+        }
         private void smboff_Click(object sender, EventArgs e)
         {
+            //SMB server
             var ismy = IsWindows();
             if (!ismy.ContainsAny("Windows XP", "Windows 7", "Windows Server 2008 R2", "Windows Vista", "Windows Server 2008"))
             {
@@ -412,10 +417,19 @@ namespace WannaCrypt_Detection
             else
             {
                 var locae = @"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters";
-                SetRegLM(locae, "SMB1", "0");
-                SetRegLM(locae, "SMB2", "0");
-                Logme(Color.Gold, "Please restart your pc to see results");
+                SetRegLm(locae, "SMB1", "0");
+                SetRegLm(locae, "SMB2", "0");
             }
+
+            //SMB client
+            //disable SMBv1
+            ExecuteCmd("sc.exe config lanmanworkstation depend= bowser/mrxsmb20/nsi");
+            ExecuteCmd("sc.exe config mrxsmb10 start= disabled");
+            //disable SMBv2 and SMBv3
+            ExecuteCmd("sc.exe config lanmanworkstation depend= bowser/mrxsmb10/nsi");
+            ExecuteCmd("sc.exe config mrxsmb20 start= disabled");
+
+            Logme(Color.Gold, "Please restart your pc to see results");
         }
 
         private void upkill_Click(object sender, EventArgs e)
@@ -453,7 +467,7 @@ namespace WannaCrypt_Detection
 
         private void button2_Click(object sender, EventArgs e)
         {
-            foreach (var x in killz) 
+            foreach (var x in _killz) 
             {
                 //TODO: hapus file
                 Logme(Color.Gold, $"{x}: {GetNamePs(x)}");
